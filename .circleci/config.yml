@@ -28,6 +28,15 @@ jobs:
           name: Verify Docker Image Exists
           command: docker images | grep monitoring-api || { echo "Image not found"; exit 1; }
       - run:
+          name: Extract Coverage Files from Docker Image
+          command: |
+            container_id=$(docker create monitoring-api:latest) && \
+            docker cp $container_id:/app/coverage ./coverage && \
+            docker rm -v $container_id
+      - store_artifacts:
+          path: ./coverage
+          destination: coverage
+      - run:
           name: Login to Docker Hub
           command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - run:
