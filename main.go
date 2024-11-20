@@ -7,7 +7,16 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/net"
 )
+
+// Map of allowed API keys
+var apiKeys = map[string]bool{
+	"cs218secret": true,
+}
 
 func setup() *os.File {
 
@@ -40,13 +49,13 @@ func main() {
 	router := gin.Default()
 
 	// Apply API key authentication middleware
-	router.Use(middleware.ApiKeyAuthMiddleware())
+	router.Use(middleware.ApiKeyAuthMiddleware(apiKeys))
 
 	// Routes
-	router.GET("/cpu", handlers.GetCPUUsage)
-	router.GET("/memory", handlers.GetMemoryUsage)
-	router.GET("/disk", handlers.GetDiskUsage)
-	router.GET("/bandwidth", handlers.GetBandwidthUsage)
+	router.GET("/cpu", handlers.GetCPUUsage(cpu.Percent))
+	router.GET("/memory", handlers.GetMemoryUsage(mem.VirtualMemory))
+	router.GET("/disk", handlers.GetDiskUsage(disk.Usage))
+	router.GET("/bandwidth", handlers.GetBandwidthUsage(net.IOCounters))
 
 	// Start the server
 	if err := router.Run("0.0.0.0:8080"); err != nil {
