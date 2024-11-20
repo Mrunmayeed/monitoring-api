@@ -12,7 +12,9 @@ workflows:
   main:
     jobs:
       - build-and-test
-      - push-docker-image
+      - push-docker-image:
+          requires:
+            - build-and-test
 
 jobs:
   build-and-test:
@@ -32,7 +34,6 @@ jobs:
             docker start -ai $container_id && \
             docker exec $container_id go test ./... -coverprofile=/coverage.out -v && \
             docker cp $container_id:/coverage.out ./coverage.out && \
-            docker cp $container_id:/coverage.html ./coverage.html && \
             docker rm -v $container_id
       - store_artifacts:
           path: ./coverage.out
