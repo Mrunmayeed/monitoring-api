@@ -80,6 +80,7 @@ WorkingDirectory=/home/ec2-user
 
 [Install]
 WantedBy=multi-user.target
+
 18. Reload the daemons: sudo systemctl daemon-reload
 19. Enable the new daemon created: sudo systemctl enable monitoring-api
 20. Start the monitoring-api daemon: sudo systemctl start monitoring-api
